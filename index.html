@@ -88,7 +88,7 @@
   <!-- Halaman Pengaturan -->
 <section id="settings" class="p-8 hidden-page">
   <div class="bg-glass rounded-2xl shadow-lg p-8 max-w-xl w-full mx-auto text-white">
-    <h2 class="text-2xl font-bold mb-4 text-center">⚙️ Pengaturan</h2>
+    <h2 id="settingsLabel" class="text-2xl font-bold mb-4 text-center">⚙️ Pengaturan</h2>
 
     <form class="space-y-6">
       <!-- Bahasa -->
@@ -106,7 +106,7 @@
         <input id="defaultCity" type="text" placeholder="Contoh: Jakarta" class="w-full p-3 rounded-xl text-black" />
       </div>
 
-      <!-- Tema (opsional jika ingin dark/light mode) -->
+      <!-- Tema -->
       <div>
         <label class="block text-sm font-medium mb-2">Tema</label>
         <div class="flex items-center space-x-4">
@@ -123,11 +123,12 @@
 
       <!-- Tombol Simpan -->
       <div class="text-center pt-4">
-        <button type="button" onclick="navigateTo('home')" class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl">Simpan Pengaturan</button>
+        <button type="button" id="saveSettings" class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl">Simpan Pengaturan</button>
       </div>
     </form>
   </div>
 </section>
+
 
 
   <!-- Halaman Saran -->
@@ -331,5 +332,76 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
   this.reset();
 });
   </script>
+  <script>
+document.addEventListener('DOMContentLoaded', function () {
+  const saveBtn = document.getElementById('saveSettings');
+  const bahasaSelect = document.getElementById('language');
+  const kotaInput = document.getElementById('defaultCity');
+  const temaRadios = document.querySelectorAll('input[name="theme"]');
+
+  // Load settings saat halaman dimuat
+  const savedBahasa = localStorage.getItem('bahasa') || 'id';
+  const savedKota = localStorage.getItem('kotaDefault') || '';
+  const savedTema = localStorage.getItem('tema') || 'dark';
+
+  bahasaSelect.value = savedBahasa;
+  kotaInput.value = savedKota;
+
+  temaRadios.forEach(radio => {
+    radio.checked = radio.value === savedTema;
+  });
+
+  if (savedTema === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+
+  applyBahasa(savedBahasa);
+
+  // Simpan saat tombol diklik
+  saveBtn.addEventListener('click', function () {
+    const bahasa = bahasaSelect.value;
+    const kota = kotaInput.value.trim();
+    const tema = document.querySelector('input[name="theme"]:checked').value;
+
+    localStorage.setItem('bahasa', bahasa);
+    localStorage.setItem('kotaDefault', kota);
+    localStorage.setItem('tema', tema);
+
+    document.documentElement.classList.toggle('dark', tema === 'dark');
+    applyBahasa(bahasa);
+    alert(bahasa === 'id' ? 'Pengaturan berhasil disimpan!' : 'Settings saved successfully!');
+  });
+
+  function applyBahasa(bahasa) {
+    const labelBahasa = document.querySelector('label[for="language"]');
+    const labelKota = document.querySelector('label[for="defaultCity"]');
+    const labelTema = document.querySelector('label.block.text-sm.font-medium.mb-2');
+    const spans = document.querySelectorAll('span.ml-2');
+    const tombol = document.getElementById('saveSettings');
+    const judul = document.getElementById('settingsLabel');
+
+    if (bahasa === 'id') {
+      judul.textContent = '⚙️ Pengaturan';
+      labelBahasa.textContent = 'Bahasa';
+      labelKota.textContent = 'Kota Default';
+      labelTema.textContent = 'Tema';
+      spans[0].textContent = 'Gelap';
+      spans[1].textContent = 'Terang';
+      tombol.textContent = 'Simpan Pengaturan';
+    } else {
+      judul.textContent = '⚙️ Settings';
+      labelBahasa.textContent = 'Language';
+      labelKota.textContent = 'Default City';
+      labelTema.textContent = 'Theme';
+      spans[0].textContent = 'Dark';
+      spans[1].textContent = 'Light';
+      tombol.textContent = 'Save Settings';
+    }
+  }
+});
+</script>
+
 </body>
 </html>
