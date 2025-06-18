@@ -196,36 +196,108 @@
 
 
 
-  <!-- Halaman Login -->
+ <!-- Halaman Login -->
 <section id="login" class="p-8 hidden-page">
   <div class="bg-glass rounded-2xl shadow-lg p-8 max-w-sm w-full mx-auto text-center">
     <h2 class="text-2xl font-bold mb-4">🔐 Masuk ke Nimbus</h2>
-    <input type="text" placeholder="Username" class="w-full p-3 mb-3 rounded-xl text-black" />
-    <input type="password" placeholder="Password" class="w-full p-3 mb-3 rounded-xl text-black" />
-    <button onclick="navigateTo('home')" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-xl w-full">Masuk</button>
-    <button onclick="navigateTo('home')" class="'">Masuk Tanpa Akun</button>
-    <p class="text-sm mt-4">Belum punya akun?
+    <input type="text" id="username" placeholder="Username" class="w-full p-3 mb-3 rounded-xl text-black bg-white" />
+    <input type="password" id="password" placeholder="Password" class="w-full p-3 mb-3 rounded-xl text-black bg-white" />
+    <button id="loginButton" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-xl w-full text-white font-semibold mb-2">Masuk</button>
+    <button onclick="masukTanpaAkun()" class="w-full underline text-blue-600 text-sm mb-3">Masuk Tanpa Akun</button>
+    <p class="text-sm mt-4 text-white">Belum punya akun?
       <button onclick="navigateTo('register')" class="underline text-blue-300 hover:text-blue-400">Daftar di sini</button>
     </p>
+    <p id="login-msg" class="mt-3 text-sm"></p>
   </div>
 </section>
+
+
+<script>
+  document.getElementById("loginButton").addEventListener("click", async function () {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!username || !password) {
+      alert("Username dan password wajib diisi.");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("username", username);
+        navigateTo("home");
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert("❌ Gagal menghubungi server.");
+    }
+  });
+
+  function masukTanpaAkun() {
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("username", "Tamu");
+    navigateTo("home");
+  }
+</script>
+
+
 
 <!-- Halaman Register -->
 <section id="register" class="p-8 hidden-page">
   <div class="bg-glass rounded-2xl shadow-lg p-8 max-w-sm w-full mx-auto text-center">
     <h2 class="text-2xl font-bold mb-4">📝 Daftar Akun Baru</h2>
-    <form id="registerForm" class="space-y-4">
-      <input type="text" placeholder="Nama Lengkap" class="w-full p-3 rounded-xl text-black" required />
-      <input type="email" placeholder="Email" class="w-full p-3 rounded-xl text-black" required />
-      <input type="text" placeholder="Username" class="w-full p-3 rounded-xl text-black" required />
-      <input type="password" placeholder="Password" class="w-full p-3 rounded-xl text-black" required />
-      <button type="submit" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-xl w-full">Daftar</button>
-    </form>
-    <p class="text-sm mt-4">Sudah punya akun?
+    <input type="text" id="register-username" placeholder="Username" class="w-full p-3 mb-3 rounded-xl text-black bg-white" />
+    <input type="password" id="register-password" placeholder="Password" class="w-full p-3 mb-3 rounded-xl text-black bg-white" />
+    <button onclick="register()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-xl w-full text-white font-semibold mb-2">Daftar</button>
+    <p class="text-sm mt-4 text-white">Sudah punya akun?
       <button onclick="navigateTo('login')" class="underline text-blue-300 hover:text-blue-400">Masuk di sini</button>
     </p>
+    <p id="register-msg" class="mt-3 text-sm"></p>
   </div>
 </section>
+
+<script>
+  document.getElementById('registerForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const inputs = this.querySelectorAll('input');
+    const [nama, email, usernameInput, passwordInput] = Array.from(inputs).map(i => i.value.trim());
+
+    if (!nama || !email || !usernameInput || !passwordInput) {
+      alert("Semua kolom harus diisi!");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: usernameInput, password: passwordInput })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        this.reset();
+        navigateTo("login");
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert("❌ Gagal menghubungi server.");
+    }
+  });
+</script>
+
 
 
 
@@ -401,5 +473,81 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 </script>
+<script>
+  document.getElementById("loginButton").addEventListener("click", async function () {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!username || !password) {
+      alert("Username dan password wajib diisi.");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+      const msg = document.getElementById("login-msg");
+      if (res.ok) {
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("username", username);
+        msg.textContent = "✅ " + data.message;
+        msg.classList.remove("text-red-400");
+        msg.classList.add("text-green-300");
+        navigateTo("home");
+      } else {
+        msg.textContent = "❌ " + data.message;
+        msg.classList.remove("text-green-300");
+        msg.classList.add("text-red-400");
+      }
+    } catch (err) {
+      alert("❌ Gagal menghubungi server.");
+    }
+  });
+
+  async function register() {
+    const username = document.getElementById("register-username").value.trim();
+    const password = document.getElementById("register-password").value.trim();
+
+    if (!username || !password) {
+      alert("Semua kolom harus diisi!");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+      const msg = document.getElementById("register-msg");
+      if (res.ok) {
+        msg.textContent = "✅ " + data.message;
+        msg.classList.remove("text-red-400");
+        msg.classList.add("text-green-300");
+        navigateTo("login");
+      } else {
+        msg.textContent = "❌ " + data.message;
+        msg.classList.remove("text-green-300");
+        msg.classList.add("text-red-400");
+      }
+    } catch (err) {
+      alert("❌ Gagal menghubungi server.");
+    }
+  }
+
+  function masukTanpaAkun() {
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("username", "Tamu");
+    navigateTo("home");
+  }
+</script>
+
 </body>
 </html>
