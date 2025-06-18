@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nimbus - SPA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <style>
+    body {
+       background-image: url('bgnimbus.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      height: 100vh;
+    }
+    .bg-glass {
+      background: rgba(0, 0, 0, 0.341);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    #map {
+      height: 300px;
+      border-radius: 1rem;
+    }
+    .hidden-page {
+      display: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-white">
+
+  <!-- Navbar -->
+  <header class="flex justify-between items-center p-6 bg-glass text-white shadow-md">
+    <div class="flex items-center space-x-2 text-2xl font-bold">
+      <span class="text-3xl">☁️</span><span>Nimbus</span>
+    </div>
+    <nav class="flex space-x-3">
+  <button onclick="navigateTo('home')" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl">🏠 Beranda</button>
+  <button onclick="navigateTo('settings')" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl">⚙️ Pengaturan</button>
+  <button onclick="navigateTo('saran')" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl">💡 Saran</button>
+  <button onclick="navigateTo('login')" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-xl">🚪 Keluar</button>
+</nav>
+
+
+  </header>
+
+  <!-- Halaman Home -->
+  <section id="home" class="p-8">
+    <div class="mb-6 text-right">
+  <button onclick="navigateTo('profil')" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl">👤 Profil</button>
+</div>
+
+    <div class="bg-glass rounded-2xl shadow-lg p-8 max-w-xl w-full mx-auto text-center">
+      <h2 class="text-3xl font-bold mb-2">Selamat datang di Nimbus!</h2>
+      <p class="mb-6 text-white/80">Lihat Langit, Rencanakan Hari.</p>
+
+      <div class="flex space-x-2 mb-6 w-full max-w-xl">
+        <input type="text" id="searchInput" placeholder="Cari kota lain..." class="flex-grow p-3 rounded-xl focus:outline-none text-black" />
+        <button type="button" onclick="searchWeather()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-xl transition">Cari</button>
+        <button type="button" onclick="getCurrentLocation()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-xl transition">📍 Lokasi Saya</button>
+      </div>
+
+      <div class="bg-white/20 rounded-xl p-6 mb-6" id="weatherDisplay">
+        <div class="text-xl font-semibold mb-2">🌤️ Jakarta</div>
+        <div class="text-5xl font-bold mb-2">30°C</div>
+        <div class="text-sm text-white/80">Cerah berawan • Angin 10km/jam • Kelembaban 65%</div>
+        <div class="flex flex-col items-center mt-4">
+          <div id="compass" class="w-16 h-16 bg-no-repeat bg-center bg-contain mb-2" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Compass_rose_pale.svg/1024px-Compass_rose_pale.svg.png'); transform: rotate(0deg); transition: transform 0.5s ease;"></div>
+          <div id="windDirectionText" class="text-sm text-white/80"></div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-xl font-semibold mb-2">Prakiraan 5 Hari Kedepan</h3>
+        <div id="forecast5Days" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
+      </div>
+    </div>
+
+    <div class="bg-glass rounded-2xl shadow-lg p-6 max-w-xl w-full text-center mt-8 mx-auto">
+      <h2 class="text-2xl font-bold mb-4">Peta Interaktif</h2>
+      <div id="map"></div>
+    </div>
+  </section>
+
+  <!-- Halaman Pengaturan -->
+<section id="settings" class="p-8 hidden-page">
+  <div class="bg-glass rounded-2xl shadow-lg p-8 max-w-xl w-full mx-auto text-white">
+    <h2 id="settingsLabel" class="text-2xl font-bold mb-4 text-center">⚙️ Pengaturan</h2>
+
+    <form class="space-y-6">
+      <!-- Bahasa -->
+      <div>
+        <label for="language" class="block text-sm font-medium mb-2">Bahasa</label>
+        <select id="language" class="w-full p-3 rounded-xl text-black">
+          <option value="id">Bahasa Indonesia</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+
+      <!-- Lokasi Default -->
+      <div>
+        <label for="defaultCity" class="block text-sm font-medium mb-2">Kota Default</label>
+        <input id="defaultCity" type="text" placeholder="Contoh: Jakarta" class="w-full p-3 rounded-xl text-black" />
+      </div>
+
+      <!-- Tema -->
+      <div>
+        <label class="block text-sm font-medium mb-2">Tema</label>
+        <div class="flex items-center space-x-4">
+          <label class="inline-flex items-center">
+            <input type="radio" name="theme" value="dark" class="form-radio text-blue-500" checked />
+            <span class="ml-2">Gelap</span>
+          </label>
+          <label class="inline-flex items-center">
+            <input type="radio" name="theme" value="light" class="form-radio text-blue-500" />
+            <span class="ml-2">Terang</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Tombol Simpan -->
+      <div class="text-center pt-4">
+        <button type="button" id="saveSettings" class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl">Simpan Pengaturan</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+
+  <!-- Halaman Saran -->
+<section id="saran" class="p-8 hidden-page">
+  <div class="bg-glass rounded-2xl shadow-lg p-8 max-w-xl w-full mx-auto text-center text-white">
+    <h2 class="text-2xl font-bold mb-4">💡 Kirim Saran Kamu</h2>
+    <p class="mb-6 text-white/80">Kami sangat menghargai masukanmu agar Nimbus bisa menjadi lebih baik.</p>
+
+    <form onsubmit="submitSaran(event)" class="space-y-4">
+      <!-- Nama -->
+      <input type="text" id="saranNama" placeholder="Nama kamu (opsional)" class="w-full p-3 rounded-xl text-black" />
+
+      <!-- Pesan -->
+      <textarea id="saranPesan" rows="4" placeholder="Tulis saran kamu..." class="w-full p-3 rounded-xl text-black"></textarea>
+
+      <!-- Rating -->
+      <div class="text-left">
+        <p class="mb-2 font-medium">Penilaian kamu:</p>
+        <div id="ratingStars" class="flex justify-center space-x-1 text-3xl cursor-pointer">
+          <span onclick="setRating(1)">☆</span>
+          <span onclick="setRating(2)">☆</span>
+          <span onclick="setRating(3)">☆</span>
+          <span onclick="setRating(4)">☆</span>
+          <span onclick="setRating(5)">☆</span>
+        </div>
+      </div>
+
+      <button type="submit" class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl w-full">Kirim Saran</button>
+    </form>
+  </div>
+</section>
+
+<!-- Halaman Profil -->
+<section id="profil" class="hidden-page p-6 text-white">
+  <div class="bg-glass rounded-2xl shadow-lg p-8 max-w-xl w-full mx-auto text-white">
+    <div class="flex items-center space-x-4">
+      <div class="w-16 h-16 rounded-full bg-black/20 flex items-center justify-center text-2xl">
+        👤
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold">Profil Pengguna</h2>
+        <p class="text-sm text-white/70">Informasi akun kamu</p>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm text-white/70 mb-1">Nama Lengkap</label>
+        <input type="text" class="w-full px-4 py-2 rounded-lg bg-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50" value="Nama Kamu" readonly>
+      </div>
+      <div>
+        <label class="block text-sm text-white/70 mb-1">Email</label>
+        <input type="email" class="w-full px-4 py-2 rounded-lg bg-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50" value="email@example.com" readonly>
+      </div>
+      <div>
+        <label class="block text-sm text-white/70 mb-1">Tanggal Daftar</label>
+        <input type="text" class="w-full px-4 py-2 rounded-lg bg-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50" value="07 Juni 2025" readonly>
+      </div>
+    </div>
+
+    <div class="text-right">
+      <button onclick="navigateTo('home')" class="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 transition">⬅️ Kembali</button>
+    </div>
+  </div>
+</section>
+
+
+
+ <!-- Halaman Login -->
+<section id="login" class="p-8 hidden-page">
+  <div class="bg-glass rounded-2xl shadow-lg p-8 max-w-sm w-full mx-auto text-center">
+    <h2 class="text-2xl font-bold mb-4">🔐 Masuk ke Nimbus</h2>
+    <input type="text" id="username" placeholder="Username" class="w-full p-3 mb-3 rounded-xl text-black bg-white" />
+    <input type="password" id="password" placeholder="Password" class="w-full p-3 mb-3 rounded-xl text-black bg-white" />
+    <button id="loginButton" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-xl w-full text-white font-semibold mb-2">Masuk</button>
+    <button onclick="masukTanpaAkun()" class="w-full underline text-blue-600 text-sm mb-3">Masuk Tanpa Akun</button>
+    <p class="text-sm mt-4 text-white">Belum punya akun?
+      <button onclick="navigateTo('register')" class="underline text-blue-300 hover:text-blue-400">Daftar di sini</button>
+    </p>
+    <p id="login-msg" class="mt-3 text-sm"></p>
+  </div>
+</section>
+
+
+<script>
+  document.getElementById("loginButton").addEventListener("click", async function () {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!username || !password) {
+      alert("Username dan password wajib diisi.");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("username", username);
+        navigateTo("home");
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert("❌ Gagal menghubungi server.");
+    }
+  });
+
+  function masukTanpaAkun() {
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("username", "Tamu");
+    navigateTo("home");
+  }
+</script>
+
+
+
+<!-- Halaman Register -->
+<section id="register" class="p-8 hidden-page">
+  <div class="bg-glass rounded-2xl shadow-lg p-8 max-w-sm w-full mx-auto text-center">
+    <h2 class="text-2xl font-bold mb-4">📝 Daftar Akun Baru</h2>
+    <input type="text" id="register-username" placeholder="Username" class="w-full p-3 mb-3 rounded-xl text-black bg-white" />
+    <input type="password" id="register-password" placeholder="Password" class="w-full p-3 mb-3 rounded-xl text-black bg-white" />
+    <button onclick="register()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-xl w-full text-white font-semibold mb-2">Daftar</button>
+    <p class="text-sm mt-4 text-white">Sudah punya akun?
+      <button onclick="navigateTo('login')" class="underline text-blue-300 hover:text-blue-400">Masuk di sini</button>
+    </p>
+    <p id="register-msg" class="mt-3 text-sm"></p>
+  </div>
+</section>
+
+<script>
+  document.getElementById('registerForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const inputs = this.querySelectorAll('input');
+    const [nama, email, usernameInput, passwordInput] = Array.from(inputs).map(i => i.value.trim());
+
+    if (!nama || !email || !usernameInput || !passwordInput) {
+      alert("Semua kolom harus diisi!");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: usernameInput, password: passwordInput })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        this.reset();
+        navigateTo("login");
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert("❌ Gagal menghubungi server.");
+    }
+  });
+</script>
+
+
+
+
+  <!-- Script Navigasi SPA & Cuaca -->
+  <script>
+    function navigateTo(pageId) {
+      document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden-page'));
+      document.getElementById(pageId).classList.remove('hidden-page');
+    }
+    window.onload = () => navigateTo('login');
+
+    const apiKey = '8e8e6f391b6892cc2b8a2bd7e7a9668e';
+
+    function getCurrentLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, () => alert("Gagal mendapatkan lokasi."));
+      }
+    }
+
+    async function showPosition(pos) {
+      const lat = pos.coords.latitude, lon = pos.coords.longitude;
+      const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=id`);
+      const data = await res.json();
+      updateWeatherUI(data);
+      getForecastByCoords(lat, lon);
+    }
+
+    async function searchWeather() {
+      const city = document.getElementById("searchInput").value.trim();
+      if (!city) return alert("Masukkan nama kota.");
+      const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=id`);
+      const data = await res.json();
+      updateWeatherUI(data);
+      getForecast(city);
+    }
+
+    function updateWeatherUI(data) {
+      const { name, main, weather, wind, coord } = data;
+      const windDeg = wind.deg;
+      document.getElementById("weatherDisplay").innerHTML = `
+        <div class="text-xl font-semibold mb-2">🌤️ ${name}</div>
+        <div class="text-5xl font-bold mb-2">${Math.round(main.temp)}°C</div>
+        <div class="text-sm text-white/80">
+          ${weather[0].description.charAt(0).toUpperCase() + weather[0].description.slice(1)} • 
+          Angin ${wind.speed} km/jam • 
+          Kelembaban ${main.humidity}%
+        </div>
+        <div class="flex flex-col items-center mt-4">
+          <div id="compass" class="w-16 h-16 bg-no-repeat bg-center bg-contain mb-2" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Compass_rose_pale.svg/1024px-Compass_rose_pale.svg.png'); transform: rotate(${windDeg}deg);"></div>
+          <div id="windDirectionText" class="text-sm text-white/80">${getWindDirection(windDeg)} (${windDeg}°)</div>
+        </div>`;
+
+      map.setView([coord.lat, coord.lon], 10);
+      marker.setLatLng([coord.lat, coord.lon]).setPopupContent(`${name}<br>${weather[0].description} • ${Math.round(main.temp)}°C`).openPopup();
+    }
+
+    function getWindDirection(deg) {
+      const dirs = ['Utara', 'Timur Laut', 'Timur', 'Tenggara', 'Selatan', 'Barat Daya', 'Barat', 'Barat Laut'];
+      return dirs[Math.round(deg / 45) % 8];
+    }
+
+    async function getForecast(city) {
+      const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric&lang=id`);
+      const data = await res.json();
+      displayForecast(data.list);
+    }
+
+    async function getForecastByCoords(lat, lon) {
+      const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=id`);
+      const data = await res.json();
+      displayForecast(data.list);
+    }
+
+    function displayForecast(list) {
+      const forecastContainer = document.getElementById("forecast5Days");
+      const filtered = list.filter(item => item.dt_txt.includes("12:00:00"));
+      forecastContainer.innerHTML = filtered.map(f => {
+        const date = new Date(f.dt_txt);
+        const day = date.toLocaleDateString('id-ID', { weekday: 'long' });
+        return `
+          <div class="bg-white/10 p-4 rounded-xl text-center">
+            <div class="text-sm mb-1">${day}</div>
+            <img src="https://openweathermap.org/img/wn/${f.weather[0].icon}.png" class="mx-auto" />
+            <div class="font-bold text-lg">${Math.round(f.main.temp)}°C</div>
+          </div>`;
+      }).join("");
+    }
+
+    const map = L.map('map').setView([-6.2, 106.8], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
+    const marker = L.marker([-6.2, 106.8]).addTo(map).bindPopup('Jakarta<br>🌤️ 30°C').openPopup();
+    // Validasi Form Register
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const inputs = this.querySelectorAll('input');
+  const values = Array.from(inputs).map(i => i.value.trim());
+  if (values.some(v => !v)) {
+    alert("Semua kolom harus diisi!");
+    return;
+  }
+  alert("Registrasi berhasil! Silakan login.");
+  navigateTo('login');
+  this.reset();
+});
+  </script>
+  <script>
+document.addEventListener('DOMContentLoaded', function () {
+  const saveBtn = document.getElementById('saveSettings');
+  const bahasaSelect = document.getElementById('language');
+  const kotaInput = document.getElementById('defaultCity');
+  const temaRadios = document.querySelectorAll('input[name="theme"]');
+
+  // Load settings saat halaman dimuat
+  const savedBahasa = localStorage.getItem('bahasa') || 'id';
+  const savedKota = localStorage.getItem('kotaDefault') || '';
+  const savedTema = localStorage.getItem('tema') || 'dark';
+
+  bahasaSelect.value = savedBahasa;
+  kotaInput.value = savedKota;
+
+  temaRadios.forEach(radio => {
+    radio.checked = radio.value === savedTema;
+  });
+
+  if (savedTema === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+
+  applyBahasa(savedBahasa);
+
+  // Simpan saat tombol diklik
+  saveBtn.addEventListener('click', function () {
+    const bahasa = bahasaSelect.value;
+    const kota = kotaInput.value.trim();
+    const tema = document.querySelector('input[name="theme"]:checked').value;
+
+    localStorage.setItem('bahasa', bahasa);
+    localStorage.setItem('kotaDefault', kota);
+    localStorage.setItem('tema', tema);
+
+    document.documentElement.classList.toggle('dark', tema === 'dark');
+    applyBahasa(bahasa);
+    alert(bahasa === 'id' ? 'Pengaturan berhasil disimpan!' : 'Settings saved successfully!');
+  });
+
+  function applyBahasa(bahasa) {
+    const labelBahasa = document.querySelector('label[for="language"]');
+    const labelKota = document.querySelector('label[for="defaultCity"]');
+    const labelTema = document.querySelector('label.block.text-sm.font-medium.mb-2');
+    const spans = document.querySelectorAll('span.ml-2');
+    const tombol = document.getElementById('saveSettings');
+    const judul = document.getElementById('settingsLabel');
+
+    if (bahasa === 'id') {
+      judul.textContent = '⚙️ Pengaturan';
+      labelBahasa.textContent = 'Bahasa';
+      labelKota.textContent = 'Kota Default';
+      labelTema.textContent = 'Tema';
+      spans[0].textContent = 'Gelap';
+      spans[1].textContent = 'Terang';
+      tombol.textContent = 'Simpan Pengaturan';
+    } else {
+      judul.textContent = '⚙️ Settings';
+      labelBahasa.textContent = 'Language';
+      labelKota.textContent = 'Default City';
+      labelTema.textContent = 'Theme';
+      spans[0].textContent = 'Dark';
+      spans[1].textContent = 'Light';
+      tombol.textContent = 'Save Settings';
+    }
+  }
+});
+</script>
+<script>
+  document.getElementById("loginButton").addEventListener("click", async function () {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!username || !password) {
+      alert("Username dan password wajib diisi.");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+      const msg = document.getElementById("login-msg");
+      if (res.ok) {
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("username", username);
+        msg.textContent = "✅ " + data.message;
+        msg.classList.remove("text-red-400");
+        msg.classList.add("text-green-300");
+        navigateTo("home");
+      } else {
+        msg.textContent = "❌ " + data.message;
+        msg.classList.remove("text-green-300");
+        msg.classList.add("text-red-400");
+      }
+    } catch (err) {
+      alert("❌ Gagal menghubungi server.");
+    }
+  });
+
+  async function register() {
+    const username = document.getElementById("register-username").value.trim();
+    const password = document.getElementById("register-password").value.trim();
+
+    if (!username || !password) {
+      alert("Semua kolom harus diisi!");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:3000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+      const msg = document.getElementById("register-msg");
+      if (res.ok) {
+        msg.textContent = "✅ " + data.message;
+        msg.classList.remove("text-red-400");
+        msg.classList.add("text-green-300");
+        navigateTo("login");
+      } else {
+        msg.textContent = "❌ " + data.message;
+        msg.classList.remove("text-green-300");
+        msg.classList.add("text-red-400");
+      }
+    } catch (err) {
+      alert("❌ Gagal menghubungi server.");
+    }
+  }
+
+  function masukTanpaAkun() {
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("username", "Tamu");
+    navigateTo("home");
+  }
+</script>
+
+</body>
+</html>

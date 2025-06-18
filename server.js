@@ -6,6 +6,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json()); // untuk membaca body JSON dari request
+
 // Simpan user secara sementara (di memori)
 const users = [];
 
@@ -37,12 +38,12 @@ app.post('/api/login', (req, res) => {
   res.json({ message: 'Login berhasil' });
 });
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
   res.send('✅ Server aktif dan merespons!');
 });
 
-app.listen(port, () => {
-  console.log(`🚀 Server berjalan di http://localhost:${port}`);
+app.listen(port, '0.0.0.0', () => {
+  console.log(`🚀 Server berjalan di http://0.0.0.0:${port}`);
 });
