@@ -261,6 +261,7 @@
     <h2 class="text-2xl font-bold mb-4">📝 Daftar Akun Baru</h2>
     <input type="text" id="register-username" placeholder="Username" class="w-full p-3 mb-3 rounded-xl text-black bg-white" />
     <input type="password" id="register-password" placeholder="Password" class="w-full p-3 mb-3 rounded-xl text-black bg-white" />
+    <input type="email" id="register-email" placeholder="Email" class="w-full p-3 mb-3 rounded-xl text-black bg-white" />
     <button onclick="register()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-xl w-full text-white font-semibold mb-2">Daftar</button>
     <p class="text-sm mt-4 text-white">Sudah punya akun?
       <button onclick="navigateTo('login')" class="underline text-blue-300 hover:text-blue-400">Masuk di sini</button>
@@ -525,38 +526,49 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  async function register() {
-    const username = document.getElementById("register-username").value.trim();
-    const password = document.getElementById("register-password").value.trim();
+ async function register() {
+  const username = document.getElementById("register-username").value.trim();
+  const email = document.getElementById("register-email").value.trim();
+  const password = document.getElementById("register-password").value.trim();
 
-    if (!username || !password) {
-      alert("Semua kolom harus diisi!");
-      return;
-    }
-
-    try {
-      const res = await fetch("http://localhost:3000/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      });
-
-      const data = await res.json();
-      const msg = document.getElementById("register-msg");
-      if (res.ok) {
-        msg.textContent = "✅ " + data.message;
-        msg.classList.remove("text-red-400");
-        msg.classList.add("text-green-300");
-        navigateTo("login");
-      } else {
-        msg.textContent = "❌ " + data.message;
-        msg.classList.remove("text-green-300");
-        msg.classList.add("text-red-400");
-      }
-    } catch (err) {
-      alert("❌ Gagal menghubungi server.");
-    }
+  if (!username || !email || !password) {
+    alert("Semua kolom harus diisi!");
+    return;
   }
+
+  try {
+    const res = await fetch("http://localhost:3000/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password, email }) // pastikan backend juga menerima email
+    });
+
+    const data = await res.json();
+    const msg = document.getElementById("register-msg");
+   if (res.ok) {
+  // Simpan ke localStorage
+  localStorage.setItem("username", username);
+  localStorage.setItem("email", email);
+  localStorage.setItem("tanggalPembuatan", new Date().toLocaleDateString('id-ID', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  }));
+
+  msg.textContent = "✅ " + data.message;
+  msg.classList.remove("text-red-400");
+  msg.classList.add("text-green-300");
+  navigateTo("login");
+}
+    } else {
+      msg.textContent = "❌ " + data.message;
+      msg.classList.remove("text-green-300");
+      msg.classList.add("text-red-400");
+    }
+  } catch (err) {
+    alert("❌ Gagal menghubungi server.");
+  }
+}
 
   function masukTanpaAkun() {
     localStorage.setItem("isLoggedIn", "true");
