@@ -551,18 +551,18 @@ document.addEventListener('DOMContentLoaded', function () {
   <script>
   // Deteksi navigasi ke halaman profil
   function navigateTo(pageId) {
-    document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden-page'));
-    document.getElementById(pageId).classList.remove('hidden-page');
+  document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden-page'));
+  document.getElementById(pageId).classList.remove('hidden-page');
 
-    // Jika ke halaman profil, update nama pengguna
-    if (pageId === 'profil') {
-      const username = localStorage.getItem("username") || "Tamu";
-      const profileNameInput = document.getElementById("profileName");
-      if (profileNameInput) {
-        profileNameInput.value = username;
-      }
+  // Jika halaman profil, tampilkan username dari localStorage
+  if (pageId === "profil") {
+    const storedUsername = localStorage.getItem("username") || "Tamu";
+    const nameInput = document.getElementById("profileName");
+    if (nameInput) {
+      nameInput.value = storedUsername;
     }
   }
+}
 </script>
 
 </body>
