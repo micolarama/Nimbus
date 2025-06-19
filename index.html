@@ -548,13 +548,13 @@ document.addEventListener('DOMContentLoaded', function () {
     navigateTo("home");
   }
 </script>
-  <script>
+<script>
   // Deteksi navigasi ke halaman profil
   function navigateTo(pageId) {
   document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden-page'));
   document.getElementById(pageId).classList.remove('hidden-page');
 
-  // Jika halaman profil, tampilkan username dari localStorage
+  // Tambahkan: sinkronisasi data profil
   if (pageId === "profil") {
     const storedUsername = localStorage.getItem("username") || "Tamu";
     const nameInput = document.getElementById("profileName");
@@ -563,6 +563,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 }
+
 </script>
 
 </body>
