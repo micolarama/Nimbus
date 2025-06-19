@@ -403,19 +403,7 @@
     const map = L.map('map').setView([-6.2, 106.8], 10);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
     const marker = L.marker([-6.2, 106.8]).addTo(map).bindPopup('Jakarta<br>🌤️ 30°C').openPopup();
-    // Validasi Form Register
-document.getElementById('registerForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const inputs = this.querySelectorAll('input');
-  const values = Array.from(inputs).map(i => i.value.trim());
-  if (values.some(v => !v)) {
-    alert("Semua kolom harus diisi!");
-    return;
-  }
-  alert("Registrasi berhasil! Silakan login.");
-  navigateTo('login');
-  this.reset();
-});
+   
   </script>
   <script>
 document.addEventListener('DOMContentLoaded', function () {
