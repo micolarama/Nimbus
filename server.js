@@ -7,6 +7,10 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // untuk membaca body JSON dari request
 
+app.get('/', (req, res) => {
+  res.send('✅ Server aktif dan merespons!');
+});
+
 // Simpan user secara sementara (di memori)
 const users = [];
 
