@@ -550,21 +550,23 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 <script>
   // Deteksi navigasi ke halaman profil
+  <script>
   function navigateTo(pageId) {
-  document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden-page'));
-  document.getElementById(pageId).classList.remove('hidden-page');
+    document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden-page'));
+    document.getElementById(pageId).classList.remove('hidden-page');
 
-  // Tambahkan: sinkronisasi data profil
-  if (pageId === "profil") {
-    const storedUsername = localStorage.getItem("username") || "Tamu";
-    const nameInput = document.getElementById("profileName");
-    if (nameInput) {
-      nameInput.value = storedUsername;
+    // Deteksi dan isi username di halaman profil
+    if (pageId === "profil") {
+      const storedUsername = localStorage.getItem("username") || "Tamu";
+      const nameInput = document.getElementById("profileName");
+      if (nameInput) {
+        nameInput.value = storedUsername;
+        console.log("✅ Username tampil:", storedUsername); // debug
+      } else {
+        console.warn("❌ input #profileName tidak ditemukan");
+      }
     }
   }
-}
-
 </script>
-
 </body>
 </html>
