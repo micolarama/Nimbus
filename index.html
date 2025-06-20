@@ -372,9 +372,12 @@ function updateWelcomeText() {
       }).join("");
     }
 
-    const map = L.map('map').setView([-6.2, 106.8], 10);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
-    const marker = L.marker([-6.2, 106.8]).addTo(map).bindPopup('Jakarta<br>🌤️ 30°C').openPopup();
+  const map = L.map('map').setView([-2.9952, 120.1979], 10); // Koordinat Palopo
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+const marker = L.marker([-2.9952, 120.1979]).addTo(map).bindPopup('Palopo').openPopup();
   </script>
   <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -383,14 +386,18 @@ document.addEventListener('DOMContentLoaded', function () {
   const kotaInput = document.getElementById('defaultCity');
   const temaRadios = document.querySelectorAll('input[name="theme"]');
 
-  // Load settings saat halaman dimuat
+  // Cek dan set kota default jika belum ada
+  if (!localStorage.getItem('kotaDefault')) {
+    localStorage.setItem('kotaDefault', 'Palopo');
+  }
+  const savedKota = localStorage.getItem('kotaDefault') || 'Palopo';
+  kotaInput.value = savedKota;
+
+  // Bahasa dan Tema
   const savedBahasa = localStorage.getItem('bahasa') || 'id';
-  const savedKota = localStorage.getItem('kotaDefault') || '';
   const savedTema = localStorage.getItem('tema') || 'dark';
 
   bahasaSelect.value = savedBahasa;
-  kotaInput.value = savedKota;
-
   temaRadios.forEach(radio => {
     radio.checked = radio.value === savedTema;
   });
@@ -403,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   applyBahasa(savedBahasa);
 
-  // Simpan saat tombol diklik
+  // Tombol simpan
   saveBtn.addEventListener('click', function () {
     const bahasa = bahasaSelect.value;
     const kota = kotaInput.value.trim();
