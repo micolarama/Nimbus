@@ -33,6 +33,7 @@
 <body class="min-h-screen text-white">
 
   <!-- Navbar -->
+ <div id="main-header">
   <header class="flex justify-between items-center p-6 bg-glass text-white shadow-md">
     <div class="flex items-center space-x-2 text-2xl font-bold">
       <span class="text-3xl">☁️</span><span>Nimbus</span>
@@ -43,6 +44,8 @@
   <button onclick="navigateTo('saran')" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl">💡 Saran</button>
   <button onclick="navigateTo('login')" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-xl">🚪 Keluar</button>
 </nav>
+</header>
+</div>
 
 
   </header>
@@ -306,6 +309,14 @@
     function navigateTo(pageId) {
   document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden-page'));
   document.getElementById(pageId).classList.remove('hidden-page');
+ 
+  // Sembunyikan header jika halaman login atau register
+  const header = document.getElementById("main-header");
+  if (pageId === "login" || pageId === "register") {
+    header.style.display = "none";
+  } else {
+    header.style.display = "block";
+  }
 
   if (pageId === "profil") {
     updateProfile();
