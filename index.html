@@ -273,6 +273,9 @@
   }
   if (pageId === "home") {
     updateWelcomeText();
+     const defaultCity = localStorage.getItem("kotaDefault") || "Palopo";
+    document.getElementById("searchInput").value = defaultCity;
+    searchWeather();
   }
 }
     function updateProfile() {
