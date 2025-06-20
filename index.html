@@ -203,43 +203,6 @@
 </section>
 
 
-<script>
-  document.getElementById("loginButton").addEventListener("click", async function () {
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value;
-
-    if (!username || !password) {
-      alert("Username dan password wajib diisi.");
-      return;
-    }
-
-    try {
-      const res = await fetch("https://steady-regal-governor.glitch.me/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        alert(data.message);
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("username", username);
-        navigateTo("home");
-      } else {
-        alert(data.message);
-      }
-    } catch (err) {
-      alert("❌ Gagal menghubungi server.");
-    }
-  });
-
-  function masukTanpaAkun() {
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("username", "Tamu");
-    navigateTo("home");
-  }
-</script>
 
 
 
