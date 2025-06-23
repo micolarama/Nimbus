@@ -297,8 +297,13 @@
 function updateWelcomeText() {
   const username = localStorage.getItem("username") || "";
   const welcome = document.getElementById("welcomeText");
+  const bahasa = localStorage.getItem("bahasa") || "id";
   if (welcome && username) {
-    welcome.textContent = `Selamat datang di Nimbus, ${username}!`;
+    if (bahasa === "id") {
+      welcome.textContent = `Selamat datang di Nimbus, ${username}!`;
+    } else {
+      welcome.textContent = `Welcome to Nimbus, ${username}!`;
+    }
   }
 }
 
@@ -435,6 +440,7 @@ document.addEventListener('DOMContentLoaded', function () {
   document.body.classList.remove('dark-mode');
 }
     applyBahasa(bahasa);
+    applyBahasaGlobal(bahasa);
     alert(bahasa === 'id' ? 'Pengaturan berhasil disimpan!' : 'Settings saved successfully!');
   });
 
@@ -464,6 +470,103 @@ document.addEventListener('DOMContentLoaded', function () {
       tombol.textContent = 'Save Settings';
     }
   }
+  function applyBahasaGlobal(bahasa) {
+  const teks = {
+    id: {
+      home: "🏠 Beranda",
+      settings: "⚙️ Pengaturan",
+      suggestion: "💡 Saran",
+      logout: "🚪 Keluar",
+      profile: "👤 Profil",
+      welcome: "Selamat datang di Nimbus",
+      tagline: "Lihat Langit, Rencanakan Hari.",
+      search: "Cari kota lain...",
+      btnSearch: "Cari",
+      location: "📍 Lokasi Saya",
+      forecastTitle: "Prakiraan 5 Hari Kedepan",
+      mapTitle: "Peta Interaktif",
+      suggestionTitle: "💡 Kirim Saran Kamu",
+      suggestionDesc: "Kami sangat menghargai masukanmu agar Nimbus bisa menjadi lebih baik.",
+      submit: "Kirim Saran",
+      loginTitle: "🔐 Masuk ke Nimbus",
+      loginBtn: "Masuk",
+      loginGuest: "Masuk Tanpa Akun",
+      registerLink: "Daftar di sini",
+      registerTitle: "📝 Daftar Akun Baru",
+      registerBtn: "Daftar",
+      loginLink: "Masuk di sini",
+      profileTitle: "Profil Pengguna",
+      profileDesc: "Informasi akun kamu",
+      backBtn: "⬅️ Kembali"
+    },
+    en: {
+      home: "🏠 Home",
+      settings: "⚙️ Settings",
+      suggestion: "💡 Suggestion",
+      logout: "🚪 Logout",
+      profile: "👤 Profile",
+      welcome: "Welcome to Nimbus",
+      tagline: "Look at the Sky, Plan the Day.",
+      search: "Search other city...",
+      btnSearch: "Search",
+      location: "📍 My Location",
+      forecastTitle: "5-Day Forecast",
+      mapTitle: "Interactive Map",
+      suggestionTitle: "💡 Send Your Suggestion",
+      suggestionDesc: "We really appreciate your feedback to make Nimbus even better.",
+      submit: "Submit Suggestion",
+      loginTitle: "🔐 Log in to Nimbus",
+      loginBtn: "Login",
+      loginGuest: "Continue as Guest",
+      registerLink: "Register here",
+      registerTitle: "📝 Register New Account",
+      registerBtn: "Register",
+      loginLink: "Log in here",
+      profileTitle: "User Profile",
+      profileDesc: "Your account info",
+      backBtn: "⬅️ Back"
+    }
+  };
+
+  const t = teks[bahasa];
+
+  // Navbar
+  document.querySelectorAll("nav button")[0].textContent = t.home;
+  document.querySelectorAll("nav button")[1].textContent = t.settings;
+  document.querySelectorAll("nav button")[2].textContent = t.suggestion;
+  document.querySelectorAll("nav button")[3].textContent = t.logout;
+
+  // Home
+  document.querySelector('#home button').textContent = t.profile;
+  document.getElementById("welcomeText").textContent = t.welcome;
+  document.querySelector("#home p").textContent = t.tagline;
+  document.getElementById("searchInput").placeholder = t.search;
+  document.querySelector("#home button.bg-blue-500").textContent = t.btnSearch;
+  document.querySelector("#home button.bg-green-500").textContent = t.location;
+  document.querySelector("#home h3").textContent = t.forecastTitle;
+  document.querySelector("#home .bg-glass.mt-8 h2").textContent = t.mapTitle;
+
+  // Saran
+  document.querySelector("#saran h2").textContent = t.suggestionTitle;
+  document.querySelector("#saran p").textContent = t.suggestionDesc;
+  document.querySelector("#saran button[type=submit]").textContent = t.submit;
+
+  // Login
+  document.querySelector("#login h2").textContent = t.loginTitle;
+  document.getElementById("loginButton").textContent = t.loginBtn;
+  document.querySelector("#login button[onclick='masukTanpaAkun()']").textContent = t.loginGuest;
+  document.querySelector("#login p button").textContent = t.registerLink;
+
+  // Register
+  document.querySelector("#register h2").textContent = t.registerTitle;
+  document.querySelector("#register button[onclick='register()']").textContent = t.registerBtn;
+  document.querySelector("#register p button").textContent = t.loginLink;
+
+  // Profil
+  document.querySelector("#profil h2").textContent = t.profileTitle;
+  document.querySelector("#profil p.text-sm").textContent = t.profileDesc;
+  document.querySelector("#profil button").textContent = t.backBtn;
+}
 });
 </script>
 <script>
