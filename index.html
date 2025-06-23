@@ -16,6 +16,13 @@
       background-attachment: fixed;
       height: 100vh;
     }
+    body.dark-mode {
+  background-image: url('cloud-dark.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
     .bg-glass {
       background: rgba(0, 0, 0, 0.341);
       backdrop-filter: blur(10px);
@@ -405,10 +412,10 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   if (savedTema === 'dark') {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
+  document.body.classList.add('dark-mode');
+} else {
+  document.body.classList.remove('dark-mode');
+}
 
   applyBahasa(savedBahasa);
 
@@ -422,7 +429,11 @@ document.addEventListener('DOMContentLoaded', function () {
     localStorage.setItem('kotaDefault', kota);
     localStorage.setItem('tema', tema);
 
-    document.documentElement.classList.toggle('dark', tema === 'dark');
+    if (tema === 'dark') {
+  document.body.classList.add('dark-mode');
+} else {
+  document.body.classList.remove('dark-mode');
+}
     applyBahasa(bahasa);
     alert(bahasa === 'id' ? 'Pengaturan berhasil disimpan!' : 'Settings saved successfully!');
   });
