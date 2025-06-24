@@ -49,7 +49,7 @@
   <button onclick="navigateTo('home')" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl">🏠 Beranda</button>
   <button onclick="navigateTo('settings')" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl">⚙️ Pengaturan</button>
   <button onclick="navigateTo('saran')" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl">💡 Saran</button>
-  <button onclick="navigateTo('login')" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-xl">🚪 Keluar</button>
+  <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-xl">🚪 Keluar</button>
 </nav>
 </header>
 </div>
@@ -270,7 +270,6 @@
   document.querySelectorAll('section').forEach(sec => sec.classList.add('hidden-page'));
   document.getElementById(pageId).classList.remove('hidden-page');
  
-  // Sembunyikan header jika halaman login atau register
   const header = document.getElementById("main-header");
   if (pageId === "login" || pageId === "register") {
     header.style.display = "none";
@@ -386,7 +385,7 @@ function updateWelcomeText() {
       }).join("");
     }
 
-  const map = L.map('map').setView([-2.9952, 120.1979], 10); // Koordinat Palopo
+  const map = L.map('map').setView([-2.9952, 120.1979], 10);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
@@ -400,7 +399,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const kotaInput = document.getElementById('defaultCity');
   const temaRadios = document.querySelectorAll('input[name="theme"]');
 
-  // Cek dan set kota default jika belum ada
   if (!localStorage.getItem('kotaDefault')) {
     localStorage.setItem('kotaDefault', 'Palopo');
   }
@@ -643,6 +641,14 @@ document.addEventListener('DOMContentLoaded', function () {
     localStorage.setItem("username", "Tamu");
     navigateTo("home");
   }
+</script>
+  <script>
+    
+  function logout() {
+  localStorage.clear();
+  alert("🚪 Kamu telah keluar dari Nimbus.");
+  navigateTo('login');
+}
 </script>
 
 </body>
