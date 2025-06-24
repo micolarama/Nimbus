@@ -650,6 +650,48 @@ document.addEventListener('DOMContentLoaded', function () {
   navigateTo('login');
 }
 </script>
+  <script>
+let currentRating = 0;
+
+function setRating(rating) {
+  currentRating = rating;
+  const stars = document.querySelectorAll("#ratingStars span");
+  stars.forEach((star, i) => {
+    star.textContent = i < rating ? "★" : "☆";
+  });
+}
+
+function submitSaran(e) {
+  e.preventDefault();
+
+  const nama = document.getElementById("saranNama").value.trim();
+  const pesan = document.getElementById("saranPesan").value.trim();
+  const rating = currentRating;
+
+  if (!pesan || !rating) {
+    alert("Pesan dan rating wajib diisi!");
+    return;
+  }
+
+  fetch("http://localhost:3000/api/saran", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nama, pesan, rating })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.message);
+    // Reset form
+    document.getElementById("saranNama").value = "";
+    document.getElementById("saranPesan").value = "";
+    setRating(0);
+
+    navigateTo("home");
+  })
+  .catch(() => alert("❌ Gagal mengirim saran."));
+}
+</script>
+
 
 </body>
 </html>
